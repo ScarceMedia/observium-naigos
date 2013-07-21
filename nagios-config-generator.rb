@@ -42,17 +42,17 @@ raise ArgumentError, "Required settings are missing. Please check settings.yaml.
 
 Syslog.open('observium-nagios', Syslog::LOG_PID, Syslog::LOG_DAEMON | Syslog::LOG_LOCAL3)
 
-Syslog.log SYSLOG::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
+Syslog.log Syslog::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
 
 mysql_client = Mysql.connect(settings['host'], settings['username'], settings['password'], settings['database'], Integer(settings['port']))
-Syslog.log SYSLOG::LOG_INFO, "Connected to #{settings['host']}"
+Syslog.log Syslog::LOG_INFO, "Connected to #{settings['host']}"
 
 CONFIG_FILE_NAME='observium_nagios_host_services.cfg'
 
 target_config_path = File.join(settings['nagios_confd'], CONFIG_FILE_NAME)
 
 temp_config = Tempfile.new(CONFIG_FILE_NAME)
-Syslog.log SYSLOG::LOG_INFO, "Generating config to temp location #{temp_config.path}"
+Syslog.log Syslog::LOG_INFO, "Generating config to temp location #{temp_config.path}"
 
 dns_resolver = Resolv::DNS.new
 
