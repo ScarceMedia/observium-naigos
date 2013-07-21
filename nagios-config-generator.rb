@@ -40,7 +40,7 @@ end
 
 raise ArgumentError, "Required settings are missing. Please check settings.yaml. \n #{missing_settings.join(', ')}" unless missing_settings.length == 0
 
-Syslog.open('observium-nagios', Syslog::LOG_PID, Syslog::LOG_DAEMON | Syslog::LOG_LOCAL3)
+Syslog.open('observium-nagios', Syslog::LOG_PID | Syslog::LOG_PERROR, Syslog::LOG_DAEMON | Syslog::LOG_LOCAL3)
 
 Syslog.log Syslog::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
 
@@ -169,6 +169,8 @@ existing_file_hash = nil
 
 if File.exists?(target_config_path)
   existing_file_hash = Digest::MD5.file(target_config_path)
+else
+
 end
 
 new_config_hash = Digest::MD5.file(temp_config.path)
