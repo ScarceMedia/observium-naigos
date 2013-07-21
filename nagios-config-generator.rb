@@ -183,8 +183,12 @@ unless existing_file_hash.nil?
   end
 end
 
+Syslog.log(Syslog::LOG_INFO, "Updating #{target_config_path} (#{existing_file_hash}) with (#{new_config_hash})")
+
 FileUtils.move temp_config.path, target_config_path
 FileUtils.chown settings['nagios_user'], settings['nagios_user'], target_config_path
+
+Syslog.log(Syslog::LOG_INFO, "restarting with #{settings['nagios_initd']}")
 
 restart_results = %x(#{settings['nagios_initd']} restart)
 puts restart_results
