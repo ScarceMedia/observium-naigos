@@ -135,7 +135,7 @@ File.open(temp_config.path, 'w') do |f|
   f << "# This config is generate by #{__FILE__}\n"
 
   #http://observium-web-01.costcoea.lab/device/device=8/
-  hosts.each do |hostname, host_values|
+  hosts.sort.each do |hostname, host_values|
     f << "define host {\n"
     f << "  host_name #{hostname}\n"
     host_values.each do |key, value|
