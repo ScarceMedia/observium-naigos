@@ -138,7 +138,7 @@ File.open(temp_config.path, 'w') do |f|
   hosts.sort.each do |hostname, host_values|
     f << "define host {\n"
     f << "  host_name #{hostname}\n"
-    host_values.each do |key, value|
+    host_values.sort.each do |key, value|
       f << "  #{key} #{value}\n" unless skip_keys.has_key?(key)
     end
     f << "}\n\n"
@@ -146,7 +146,7 @@ File.open(temp_config.path, 'w') do |f|
     host_values['services'].each do |service|
       f << "define service {\n"
       f << "  host_name #{hostname}\n"
-      service.each do |key, value|
+      service.sort.each do |key, value|
         f << "  #{key} #{value}\n" unless skip_keys.has_key?(key)
       end
       f << "}\n\n"
