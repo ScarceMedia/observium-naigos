@@ -87,12 +87,12 @@ mysql_client.query('select device_id, lower(hostname), lower(os) from devices').
       end
     end
   rescue Exception => ex
-    log('ERROR', ex.message)
+    syslog.log(Syslog::LOG_ERROR, ex.message)
   end
 end
 
 if settings['nagios_host_dependency']
-  log('INFO', 'Querying for dependencies')
+  syslog.log(Syslog::LOG_INFO, 'Querying for dependencies')
 
   mysql_client.query("SELECT
 	lower(d.hostname),
@@ -112,16 +112,16 @@ where
 
 
     unless hosts.has_key?(hostname)
-      log('DEBUG', "Skipping #{hostname} because we don't have a host entry in nagios for hostname")
+      syslog.log(Syslog::LOG_DEBUG, "Skipping #{hostname} because we don't have a host entry in nagios for hostname")
       next
     end
 
     unless hosts.has_key?(remote_hostname)
-      log('DEBUG', "Skipping #{remote_hostname} because we don't have a host entry in nagios for remote_hostname")
+      syslog.log(Syslog::LOG_DEBUG, "Skipping #{remote_hostname} because we don't have a host entry in nagios for remote_hostname")
       next
     end
 
-    log('INFO', "Found dependency. #{hostname} on #{remote_hostname}")
+    syslog.log(Syslog::LOG_INFO, "Found dependency. #{hostname} on #{remote_hostname}")
 
     hosts[hostname]['host_dependencies'] << remote_hostname
 
@@ -175,7 +175,7 @@ new_config_hash = Digest::MD5.file(temp_config.path)
 
 unless existing_file_hash.nil?
   if new_config_hash == existing_file_hash
-    log('INFO', 'Config has not changed so exiting')
+    syslog.log(Syslog::LOG_INFO, 'Config has not changed so exiting')
 
     exit 0
   end
