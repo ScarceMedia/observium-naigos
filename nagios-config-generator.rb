@@ -5,7 +5,7 @@ require 'fileutils'
 require 'resolv'
 require 'uri'
 require 'digest/md5'
-require 'Syslog'
+require 'syslog'
 
 unless File.exists?('settings.yaml')
   example = {
