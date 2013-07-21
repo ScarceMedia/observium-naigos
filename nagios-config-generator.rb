@@ -5,10 +5,7 @@ require 'fileutils'
 require 'resolv'
 require 'uri'
 require 'digest/md5'
-
-def log(level, message)
-  puts "#{Time.now} #{level} - #{message}"
-end
+require 'syslog'
 
 unless File.exists?('settings.yaml')
   example = {
@@ -43,17 +40,19 @@ end
 
 raise ArgumentError, "Required settings are missing. Please check settings.yaml. \n #{missing_settings.join(', ')}" unless missing_settings.length == 0
 
-log 'INFO', "Connecting to #{settings['database']} on #{settings['host']}"
+Syslog.open('observium-nagios', Syslog::LOG_PID, Syslog::LOG_DAEMON | Syslog::LOG_LOCAL3)
+
+syslog.log SYSLOG::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
 
 mysql_client = Mysql.connect(settings['host'], settings['username'], settings['password'], settings['database'], Integer(settings['port']))
-log 'INFO', "Connected to #{settings['host']}"
+syslog.log SYSLOG::LOG_INFO, "Connected to #{settings['host']}"
 
 CONFIG_FILE_NAME='observium_nagios_host_services.cfg'
 
 target_config_path = File.join(settings['nagios_confd'], CONFIG_FILE_NAME)
 
 temp_config = Tempfile.new(CONFIG_FILE_NAME)
-log 'INFO', "Generating config to temp location #{temp_config.path}"
+syslog.log SYSLOG::LOG_INFO, "Generating config to temp location #{temp_config.path}"
 
 dns_resolver = Resolv::DNS.new
 
