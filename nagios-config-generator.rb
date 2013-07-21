@@ -45,7 +45,7 @@ raise ArgumentError, "Required settings are missing. Please check settings.yaml.
 
 log 'INFO', "Connecting to #{settings['database']} on #{settings['host']}"
 
-mysql_client = Mysql.connect(settings['host'], settings['username'], settings['password'], settings['database'], settings['port'])
+mysql_client = Mysql.connect(settings['host'], settings['username'], settings['password'], settings['database'], Integer(settings['port']))
 log 'INFO', "Connected to #{settings['host']}"
 
 CONFIG_FILE_NAME='observium_nagios_host_services.cfg'
