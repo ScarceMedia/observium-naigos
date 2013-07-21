@@ -5,7 +5,7 @@ require 'fileutils'
 require 'resolv'
 require 'uri'
 require 'digest/md5'
-require 'syslog'
+require 'Syslog'
 
 unless File.exists?('settings.yaml')
   example = {
@@ -42,17 +42,17 @@ raise ArgumentError, "Required settings are missing. Please check settings.yaml.
 
 Syslog.open('observium-nagios', Syslog::LOG_PID, Syslog::LOG_DAEMON | Syslog::LOG_LOCAL3)
 
-syslog.log SYSLOG::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
+Syslog.log SYSLOG::LOG_INFO, "Connecting to #{settings['database']} on #{settings['host']}"
 
 mysql_client = Mysql.connect(settings['host'], settings['username'], settings['password'], settings['database'], Integer(settings['port']))
-syslog.log SYSLOG::LOG_INFO, "Connected to #{settings['host']}"
+Syslog.log SYSLOG::LOG_INFO, "Connected to #{settings['host']}"
 
 CONFIG_FILE_NAME='observium_nagios_host_services.cfg'
 
 target_config_path = File.join(settings['nagios_confd'], CONFIG_FILE_NAME)
 
 temp_config = Tempfile.new(CONFIG_FILE_NAME)
-syslog.log SYSLOG::LOG_INFO, "Generating config to temp location #{temp_config.path}"
+Syslog.log SYSLOG::LOG_INFO, "Generating config to temp location #{temp_config.path}"
 
 dns_resolver = Resolv::DNS.new
 
@@ -87,12 +87,12 @@ mysql_client.query('select device_id, lower(hostname), lower(os) from devices').
       end
     end
   rescue Exception => ex
-    syslog.log(Syslog::LOG_ERROR, ex.message)
+    Syslog.log(Syslog::LOG_ERROR, ex.message)
   end
 end
 
 if settings['nagios_host_dependency']
-  syslog.log(Syslog::LOG_INFO, 'Querying for dependencies')
+  Syslog.log(Syslog::LOG_INFO, 'Querying for dependencies')
 
   mysql_client.query("SELECT
 	lower(d.hostname),
@@ -112,16 +112,16 @@ where
 
 
     unless hosts.has_key?(hostname)
-      syslog.log(Syslog::LOG_DEBUG, "Skipping #{hostname} because we don't have a host entry in nagios for hostname")
+      Syslog.log(Syslog::LOG_DEBUG, "Skipping #{hostname} because we don't have a host entry in nagios for hostname")
       next
     end
 
     unless hosts.has_key?(remote_hostname)
-      syslog.log(Syslog::LOG_DEBUG, "Skipping #{remote_hostname} because we don't have a host entry in nagios for remote_hostname")
+      Syslog.log(Syslog::LOG_DEBUG, "Skipping #{remote_hostname} because we don't have a host entry in nagios for remote_hostname")
       next
     end
 
-    syslog.log(Syslog::LOG_INFO, "Found dependency. #{hostname} on #{remote_hostname}")
+    Syslog.log(Syslog::LOG_INFO, "Found dependency. #{hostname} on #{remote_hostname}")
 
     hosts[hostname]['host_dependencies'] << remote_hostname
 
@@ -175,7 +175,7 @@ new_config_hash = Digest::MD5.file(temp_config.path)
 
 unless existing_file_hash.nil?
   if new_config_hash == existing_file_hash
-    syslog.log(Syslog::LOG_INFO, 'Config has not changed so exiting')
+    Syslog.log(Syslog::LOG_INFO, 'Config has not changed so exiting')
 
     exit 0
   end
