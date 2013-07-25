@@ -83,11 +83,11 @@ mysql_client.query('select device_id, community, lower(hostname), lower(os) from
       if settings['nagios_os_specific_checks'].has_key?(os)
         os_specific_checks = settings['nagios_os_specific_checks'][os]
 
-        os_specific_checks.each do |os_specific_check, settings|
+        os_specific_checks.each do |os_specific_check, check_settings|
 
           nagios_command = os_specific_check
 
-          nagios_command += "!#{community}" if settings['community'] == true
+          nagios_command += "!#{community}" if check_settings['community'] == true
 
           service = {
               'use'       => os_specific_check,
