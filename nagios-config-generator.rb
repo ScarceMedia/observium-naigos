@@ -7,7 +7,7 @@ require 'uri'
 require 'digest/md5'
 require 'syslog'
 
-settings_path = File.join(File.dirname(__FILE__), 'settingsa.yaml')
+settings_path = File.join(File.dirname(__FILE__), 'settings.yaml')
 
 unless File.exists?(settings_path)
   example = {
