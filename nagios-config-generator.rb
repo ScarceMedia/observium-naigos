@@ -7,7 +7,9 @@ require 'uri'
 require 'digest/md5'
 require 'syslog'
 
-unless File.exists?('settings.yaml')
+settings_path = File.join(File.dirname(__FILE__), 'settings.yaml')
+
+unless File.exists?(settings_path)
   example = {
       'host'                 => 'observium-sql.example.com',
       'username'             => 'nagios',
@@ -27,10 +29,10 @@ unless File.exists?('settings.yaml')
           ]
       }
   }
-  raise ArgumentError, "settings.yaml could not be found. Example contents:\n#{example.to_yaml}"
+  raise ArgumentError, "#{settings_path} could not be found. Example contents:\n#{example.to_yaml}"
 end
 
-settings = YAML.load_file('settings.yaml')
+settings = YAML.load_file(settings_path)
 
 missing_settings = []
 
