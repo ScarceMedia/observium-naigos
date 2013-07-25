@@ -91,7 +91,7 @@ mysql_client.query('select device_id, community, lower(hostname), lower(os) from
 
           service = {
               'use'       => os_specific_check,
-              'command'   => nagios_command,
+              'check_command'   => nagios_command,
               'notes_url' => device_url
           }
           hosts[hostname]['services'] << service
