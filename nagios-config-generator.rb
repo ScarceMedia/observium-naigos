@@ -7,7 +7,7 @@ require 'uri'
 require 'digest/md5'
 require 'syslog'
 
-settings_path = File.join(File.dirname(__FILE__), 'settings.yaml')
+settings_path = File.join(File.dirname(__FILE__), 'settingsa.yaml')
 
 unless File.exists?(settings_path)
   example = {
@@ -23,10 +23,14 @@ unless File.exists?(settings_path)
       'nagios_host_template' => 'observium-host',
       'nagios_host_dependency' => true,
       'nagios_os_specific_checks' => {
-          'ios' => [
-              'observium-ios-check-cpu',
-              'observium-ios-check-mem'
-          ]
+          'ios' => {
+              'cisco-ios-check-mem' => {
+                'community' => true
+              },
+              'cisco-ios-check-load' => {
+                'community' => true
+              }
+          }
       }
   }
   raise ArgumentError, "#{settings_path} could not be found. Example contents:\n#{example.to_yaml}"
@@ -60,7 +64,7 @@ dns_resolver = Resolv::DNS.new
 
 hosts = {}
 
-mysql_client.query('select device_id, lower(hostname), lower(os) from devices').each do |device_id, hostname, os|
+mysql_client.query('select device_id, community, lower(hostname), lower(os) from devices').each do |device_id, community, hostname, os|
 
   device_url = URI.join(settings['weburl'], "device/device=#{device_id}/").to_s
 
@@ -79,9 +83,15 @@ mysql_client.query('select device_id, lower(hostname), lower(os) from devices').
       if settings['nagios_os_specific_checks'].has_key?(os)
         os_specific_checks = settings['nagios_os_specific_checks'][os]
 
-        os_specific_checks.each do |os_specific_check|
+        os_specific_checks.each do |os_specific_check, settings|
+
+          nagios_command = os_specific_check
+
+          nagios_command += "!#{community}" if settings['community'] == true
+
           service = {
               'use'       => os_specific_check,
+              'command'   => nagios_command,
               'notes_url' => device_url
           }
           hosts[hostname]['services'] << service
