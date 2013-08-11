@@ -99,7 +99,7 @@ mysql_client.query('select device_id, community, lower(hostname), lower(os) from
       end
     end
   rescue Exception => ex
-    Syslog.log(Syslog::LOG_ERROR, ex.message)
+    Syslog.log(Syslog::LOG_ERR, ex.message)
   end
 end
 
